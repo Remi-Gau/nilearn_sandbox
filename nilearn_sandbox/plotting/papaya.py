@@ -36,8 +36,7 @@ def papaya_viewer(maps_niimg, output_file=None):
 
     with open(os.path.join(data, 'template.html'), 'rb') as f:
         template = f.read().decode('utf-8')
-    javascript = u''
-    javascript += 'var maps = "'
+    javascript = u'' + 'var maps = "'
     javascript += _get_64(maps_niimg)
     javascript += '";\n'
     javascript += 'var template = "'

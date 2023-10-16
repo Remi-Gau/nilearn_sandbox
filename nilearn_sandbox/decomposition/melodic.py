@@ -75,7 +75,7 @@ class MelodicICA(BaseEstimator, TransformerMixin):
         # Temporary directory
         tmp = tempfile.mkdtemp()
         if self.verbose > 0:
-            print('Temp dir: %s' % tmp)
+            print(f'Temp dir: {tmp}')
 
         # If a mask is given, we use it, otherwise we use bet.
         if self.mask is not None:
@@ -88,15 +88,13 @@ class MelodicICA(BaseEstimator, TransformerMixin):
             melodic.inputs.no_bet = True
             melodic.inputs.mask = mask_file
 
-        in_files = []
         # For first file: we save or copy it into the temp directory because
         # this is where melodic stores ica results.
         if isinstance(X[0], basestring):
             shutil.copy(X[0], join(tmp, 'ica.nii.gz'))
         else:
             nibabel.save(X[0], join(tmp, 'ica.nii.gz'))
-        in_files.append(join(tmp, 'ica.nii.gz'))
-
+        in_files = [join(tmp, 'ica.nii.gz')]
         for i, x in enumerate(X[1:]):
             if isinstance(x, basestring):
                 in_files.append(x)
@@ -118,7 +116,7 @@ class MelodicICA(BaseEstimator, TransformerMixin):
         melodic.inputs.out_dir = tmp
         melodic._cmd = _find_fsl_exe(melodic._cmd, verbose=self.verbose - 1)
         if self.verbose > 0:
-            print('Melodic command line: %s' % melodic.cmdline)
+            print(f'Melodic command line: {melodic.cmdline}')
         melodic.run()
 
         # Load results

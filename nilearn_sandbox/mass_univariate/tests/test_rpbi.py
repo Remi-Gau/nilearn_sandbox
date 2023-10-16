@@ -421,8 +421,8 @@ def test_rpbi_core_withcovars(random_state=0):
     # Replace intercept test with a more complex test
     rng = check_random_state(random_state)
     tested_var = np.ones(8)
-    tested_var[0:4] = 0
-    parcelled_data[0:4] *= -1
+    tested_var[:4] = 0
+    parcelled_data[:4] *= -1
     pvalues, counting_statistic_original_data, h0 = rpbi_core(
         tested_var, parcelled_data, n_parcellations, labels,
         n_parcels, confounding_vars=covars, model_intercept=False,

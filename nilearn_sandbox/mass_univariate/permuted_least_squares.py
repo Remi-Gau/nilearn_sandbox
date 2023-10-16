@@ -228,11 +228,7 @@ def permuted_ols(tested_vars, target_vars, confounding_vars=None,
     n_samples, n_regressors = tested_vars.shape
 
     # check if explanatory variates is intercept (constant) or not
-    if (n_regressors == 1 and np.unique(tested_vars).size == 1):
-        intercept_test = True
-    else:
-        intercept_test = False
-
+    intercept_test = n_regressors == 1 and np.unique(tested_vars).size == 1
     # optionally add intercept
     if model_intercept and not intercept_test:
         if confounding_vars is not None:

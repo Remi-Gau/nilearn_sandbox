@@ -182,10 +182,12 @@ def orthogonalize_design(tested_vars, target_vars, confounding_vars=None):
         tested_vars_resid_covars = np.ascontiguousarray(
             tested_vars_resid_covars)
 
-    orthogonalized_design = (tested_vars_resid_covars,
-                             target_vars_resid_covars.T,
-                             covars_orthonormalized, lost_dof)
-    return orthogonalized_design
+    return (
+        tested_vars_resid_covars,
+        target_vars_resid_covars.T,
+        covars_orthonormalized,
+        lost_dof,
+    )
 
 
 def t_score_with_covars_and_normalized_design(tested_vars, target_vars,

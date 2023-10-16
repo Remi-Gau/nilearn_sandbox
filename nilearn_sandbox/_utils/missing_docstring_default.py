@@ -111,9 +111,7 @@ if __name__ == "__main__":
                     )
                 }
 
-                missing = get_missing(docstring, default_args)
-                # Log arguments with missing default values in documentation.
-                if missing:
+                if missing := get_missing(docstring, default_args):
                     if create_module_header:
                         create_module_header = False
                         fout.write(f"# {relative_filename}\n")

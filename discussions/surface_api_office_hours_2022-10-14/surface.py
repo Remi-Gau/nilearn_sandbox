@@ -210,14 +210,16 @@ class SurfaceLabelsMasker:
 
 def load_fsaverage(mesh_name: str = "fsaverage5") -> PolyMeshFamily:
     fsaverage = datasets.fetch_surf_fsaverage(mesh_name)
-    meshes: Dict[str, Dict[str, Mesh]] = {}
     renaming = {"pial": "pial", "white": "white_matter", "infl": "inflated"}
-    for mesh_type, mesh_name in renaming.items():
-        meshes[mesh_name] = {}
-        for hemisphere in "left", "right":
-            meshes[mesh_name][f"{hemisphere}_hemisphere"] = Mesh(
+    meshes: Dict[str, Dict[str, Mesh]] = {
+        mesh_name: {
+            f"{hemisphere}_hemisphere": Mesh(
                 fsaverage[f"{mesh_type}_{hemisphere}"]
             )
+            for hemisphere in ("left", "right")
+        }
+        for mesh_type, mesh_name in renaming.items()
+    }
     return meshes
 
 

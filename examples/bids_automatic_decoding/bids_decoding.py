@@ -20,14 +20,14 @@ def demo_datasets(dataset):
 
     if dataset == "ds000105":
         t_r = 2.5
-        subjects = ["{}".format(x) for x in range(1, 5)]
+        subjects = [f"{x}" for x in range(1, 5)]
         task = "objectviewing"
         n_runs = 12
         conditions = ['scissors', 'face', 'cat', 'shoe',
                       'house', 'scrambledpix', 'bottle', 'chair']
 
-        data_dir = "/storage/store/data/OpenNeuro/{}/".format(dataset)
-        source_dir = opj(data_dir, "{}_R2.0.2/uncompressed/".format(dataset))
+        data_dir = f"/storage/store/data/OpenNeuro/{dataset}/"
+        source_dir = opj(data_dir, f"{dataset}_R2.0.2/uncompressed/")
 
     elif dataset == "ds000107":
         # Betamaps on blocks, several per subject per condition. Use it
@@ -38,8 +38,8 @@ def demo_datasets(dataset):
         conditions = ['Words', 'Objects',
                       'Scrambled objects', 'Consonant strings']
 
-        data_dir = "/storage/store/data/OpenNeuro/{}/".format(dataset)
-        source_dir = opj(data_dir, "{}_R2.0.2/uncompressed/".format(dataset))
+        data_dir = f"/storage/store/data/OpenNeuro/{dataset}/"
+        source_dir = opj(data_dir, f"{dataset}_R2.0.2/uncompressed/")
 
     elif dataset == "ds000117":
         t_r = 2.0
@@ -48,18 +48,23 @@ def demo_datasets(dataset):
         n_runs = 9
         conditions = ["FAMOUS", "UNFAMILIAR", "SCRAMBLED"]
 
-        data_dir = "/storage/store/data/OpenNeuro/{}/".format(dataset)
-        source_dir = opj(data_dir, "{}_R1.0.3".format(dataset))
+        data_dir = f"/storage/store/data/OpenNeuro/{dataset}/"
+        source_dir = opj(data_dir, f"{dataset}_R1.0.3")
 
     runs = ["{:0>2d}".format(x) for x in range(1, n_runs)]
     derivatives_dir = opj(data_dir, "fmriprep/")
     out_dir = opj("/storage/store/derivatives", dataset)
 
-    datasets_infos = Bunch(t_r=t_r, subjects=subjects, task=task, runs=runs,
-                           conditions=conditions, source_dir=source_dir,
-                           derivatives_dir=derivatives_dir, out_dir=out_dir)
-
-    return datasets_infos
+    return Bunch(
+        t_r=t_r,
+        subjects=subjects,
+        task=task,
+        runs=runs,
+        conditions=conditions,
+        source_dir=source_dir,
+        derivatives_dir=derivatives_dir,
+        out_dir=out_dir,
+    )
 
 
 """
@@ -89,20 +94,34 @@ def mocked_bids_fetcher(dataset):
                                       datasets_infos.runs):
 
         # ugly automatic handling of multimodal dataset to focus on fMRI
-        if not isdir(opj(datasets_infos.source_dir, "sub-{}".format(sub), "func")) and isdir(opj(datasets_infos.source_dir, "sub-{}".format(sub), "ses-mri", "func")):
-            file = opj("sub-{}".format(sub), "ses-mri", "func",
-                       "sub-{}_ses-mri_task-{}_run-{}".format(sub,
-                                                              datasets_infos.task, run))
+        if not isdir(
+            opj(datasets_infos.source_dir, f"sub-{sub}", "func")
+        ) and isdir(
+            opj(datasets_infos.source_dir, f"sub-{sub}", "ses-mri", "func")
+        ):
+            file = opj(
+                f"sub-{sub}",
+                "ses-mri",
+                "func",
+                f"sub-{sub}_ses-mri_task-{datasets_infos.task}_run-{run}",
+            )
         else:
-            file = opj("sub-{}".format(sub), "func",
-                       "sub-{}_task-{}_run-{}".format(sub, datasets_infos.task, run))
+            file = opj(
+                f"sub-{sub}",
+                "func",
+                f"sub-{sub}_task-{datasets_infos.task}_run-{run}",
+            )
 
-        events.append(opj(datasets_infos.source_dir,
-                          "{}_events.tsv".format(file)))
-        confounds.append(opj(datasets_infos.derivatives_dir,
-                             "{}_bold_confounds.tsv".format(file)))
-        preprocessed_fmri.append(opj(datasets_infos.derivatives_dir,
-                                     "{}_bold_space-MNI152NLin2009cAsym_preproc.nii.gz".format(file)))
+        events.append(opj(datasets_infos.source_dir, f"{file}_events.tsv"))
+        confounds.append(
+            opj(datasets_infos.derivatives_dir, f"{file}_bold_confounds.tsv")
+        )
+        preprocessed_fmri.append(
+            opj(
+                datasets_infos.derivatives_dir,
+                f"{file}_bold_space-MNI152NLin2009cAsym_preproc.nii.gz",
+            )
+        )
 
     return datasets_infos, preprocessed_fmri, events, confounds
 
@@ -173,8 +192,10 @@ def expand_trial_type_per_event(trial_type, per_event_type):
     """
     expanded_trial_type = copy.deepcopy(trial_type)
     n_conds = (trial_type == per_event_type).sum()
-    expanded_trial_type[trial_type == per_event_type] = ['%s_%0{}d'.format(
-        len(str(n_conds))) % (per_event_type, i) for i in range(n_conds)]
+    expanded_trial_type[trial_type == per_event_type] = [
+        (f'%s_%0{len(str(n_conds))}d' % (per_event_type, i))
+        for i in range(n_conds)
+    ]
     return expanded_trial_type
 
 
@@ -253,8 +274,9 @@ def fit_design_matrix(fmri, model, save_location, design_matrix, event,
     filenames = []
     for trial in design_matrix.loc[:, design_matrix.columns.str.contains('|'.join(trials_of_interest_))].columns:
         image = model.compute_contrast(design_matrix.columns == trial)
-        filename = os.path.join(save_location, "{}_{}_{}_{}.nii.gz".format(
-            sub, run, trial, type_of_modeling))
+        filename = os.path.join(
+            save_location, f"{sub}_{run}_{trial}_{type_of_modeling}.nii.gz"
+        )
         image.to_filename(filename)
         filenames.append(filename)
     sorted(filenames)

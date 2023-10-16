@@ -642,11 +642,7 @@ def rpbi_core(tested_var, target_vars,
     n_samples = tested_var.shape[0]
 
     # check if explanatory variates is intercept (constant) or not
-    if np.unique(tested_var).size == 1:
-        intercept_test = True
-    else:
-        intercept_test = False
-
+    intercept_test = np.unique(tested_var).size == 1
     # optionally add intercept
     if model_intercept and not intercept_test:
         if confounding_vars is not None:
@@ -707,8 +703,7 @@ def rpbi_core(tested_var, target_vars,
         shape=(n_parcels_all_parcellations, n_voxels),
         dtype=np.float32).tocsc()
     # slice permutations to treat them in parallel
-    perm_lots_slices = [s for s in
-                        gen_even_slices(n_perm + 1, min(n_perm, n_jobs))]
+    perm_lots_slices = list(gen_even_slices(n_perm + 1, min(n_perm, n_jobs)))
     perm_lots_sizes = [np.sum(all_results.sizes[s]) for s in perm_lots_slices]
     perm_lots_cuts = np.concatenate(([0], np.cumsum(perm_lots_sizes)))
     perm_lots = [
